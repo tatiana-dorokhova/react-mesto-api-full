@@ -1,3 +1,4 @@
+const process = require('process');
 const { Error } = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jsonwebtoken = require('jsonwebtoken');
@@ -5,8 +6,9 @@ const User = require('../models/user');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
 const NotFoundError = require('../errors/notFoundError');
+const { CREATED_STATUS } = require('../utils/constants');
 
-const { CREATED_STATUS, JWT_SALT } = require('../utils/constants');
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -122,7 +124,7 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
-      const token = jsonwebtoken.sign({ _id: user._id }, JWT_SALT, {
+      const token = jsonwebtoken.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', {
         expiresIn: '7d',
       });
 
@@ -133,6 +135,7 @@ const login = (req, res, next) => {
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
+          sameSite: true,
         })
         .send({ message: 'Authorization successful' });
     })

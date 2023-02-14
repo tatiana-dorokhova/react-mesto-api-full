@@ -14,3 +14,7 @@ node_modules
 .idea
 .vscode
 .prettierrc
+
+# Environment
+.env
+.prettierrc
