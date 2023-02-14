@@ -50,9 +50,7 @@ const createCard = (req, res, next) => {
     .catch((err) => {
       // если произошла ошибка валидации данных, то выдать ошибку 400
       if (err instanceof Error.ValidationError) {
-        next(
-          new BadRequestError('Неверный формат данных при создании карточки'),
-        );
+        next(new BadRequestError('Неверный формат данных при создании карточки'));
         return;
       }
       next(err);

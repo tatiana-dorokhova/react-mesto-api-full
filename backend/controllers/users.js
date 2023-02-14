@@ -26,6 +26,7 @@ const getUserById = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным id не найден');
       }
+
       res.send(user);
     })
     .catch((err) => {
@@ -53,29 +54,29 @@ const createUser = (req, res, next) => {
   bcrypt
     .hash(password, 10)
     .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
     }))
     .then((user) => {
       // удаляем пароль из ответа
       const userObjectWithoutPassword = user.toObject();
       delete userObjectWithoutPassword.password;
-      res.status(CREATED_STATUS).send(userObjectWithoutPassword);
+      res.status(CREATED_STATUS).send({
+        data: { _id: userObjectWithoutPassword._id, email: userObjectWithoutPassword.email },
+      });
     })
     .catch((err) => {
       // если произошла ошибка валидации данных, то выдать ошибку 400
       if (err instanceof Error.ValidationError) {
-        next(
-          new BadRequestError(
-            'Неверный формат данных при создании пользователя',
-          ),
-        );
+        next(new BadRequestError('Неверный формат данных при создании пользователя'));
         return;
       }
       // если в базе есть пользователь с таким же email, выдать ошибку 409
       if (err.code === 11000) {
-        next(
-          new ConflictError('Пользователь с таким email уже заведен в системе'),
-        );
+        next(new ConflictError('Пользователь с таким email уже заведен в системе'));
         return;
       }
       next(err);
@@ -98,9 +99,7 @@ const updateUserData = (req, res, next) => {
     .then((user) => {
       // если пользователь с таким id не найден, то выдать ошибку 404
       if (!user) {
-        throw new NotFoundError(
-          'Пользователь с заданным id не найден',
-        );
+        throw new NotFoundError('Пользователь с заданным id не найден');
       }
       res.send(user);
     })
@@ -108,9 +107,7 @@ const updateUserData = (req, res, next) => {
       // если произошла ошибка валидации данных, то выдать ошибку 400
       if (err instanceof Error.ValidationError) {
         next(
-          new BadRequestError(
-            `Неверный формат данных при обновлении пользователя ${err.message}`,
-          ),
+          new BadRequestError(`Неверный формат данных при обновлении пользователя ${err.message}`),
         );
         return;
       }
@@ -124,9 +121,13 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
-      const token = jsonwebtoken.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', {
-        expiresIn: '7d',
-      });
+      const token = jsonwebtoken.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        {
+          expiresIn: '7d',
+        },
+      );
 
       // вернём токен
       // можно вернуть его просто в ответе: res.send({ token });
