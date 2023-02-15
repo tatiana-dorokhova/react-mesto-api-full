@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
+const cors = require('./middlewares/cors');
 const router = require('./routes/index');
 const handleErr = require('./middlewares/handleErr');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -21,6 +22,7 @@ mongoose.set('strictQuery', false);
 mongoose.connect(DB_CONN);
 
 app.use(requestLogger); // логгер запросов
+app.use(cors);
 
 app.use(router);
 
