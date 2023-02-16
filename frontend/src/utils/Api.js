@@ -1,4 +1,4 @@
-const BASE_URL = require('./constants');
+import { BASE_URL } from './constants';
 
 class Api {
   constructor({ baseUrl, headers }) {

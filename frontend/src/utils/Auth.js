@@ -1,4 +1,4 @@
-const BASE_URL = require('./constants');
+import { BASE_URL } from './constants';
 
 export const register = ({ email, password }) => {
   return fetch(`${BASE_URL}/signup`, {
