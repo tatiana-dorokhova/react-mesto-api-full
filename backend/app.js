@@ -10,6 +10,8 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
+app.use(cors);
+
 app.use(cookieParser());
 
 // подключение встроенного body-parser-а json в express для расшифровки тела запросов
@@ -22,7 +24,6 @@ mongoose.set('strictQuery', false);
 mongoose.connect(DB_CONN);
 
 app.use(requestLogger); // логгер запросов
-app.use(cors);
 
 app.use(router);
 
