@@ -1,8 +1,0 @@
-.popup__submit-button_disabled {
-  opacity: .2;
-}
-
-.popup__submit-button_disabled:hover {
-  cursor: auto;
-  opacity: .2;
-}
