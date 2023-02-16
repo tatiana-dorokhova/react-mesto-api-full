@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://api.mesto.dorokhova.nomoredomains.work';
+const BASE_URL = require('./constants');
 
 export const register = ({ email, password }) => {
   return fetch(`${BASE_URL}/signup`, {

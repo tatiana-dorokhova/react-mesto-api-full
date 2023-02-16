@@ -1,3 +1,5 @@
+const BASE_URL = require('./constants');
+
 class Api {
   constructor({ baseUrl, headers }) {
     this._baseUrl = baseUrl;
@@ -97,7 +99,7 @@ class Api {
 }
 
 export const api = new Api({
-  baseUrl: 'http://api.mesto.dorokhova.nomoredomains.work',
+  baseUrl: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
