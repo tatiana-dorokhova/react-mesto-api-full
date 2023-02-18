@@ -1,3 +1,4 @@
+require('dotenv').config();
 const process = require('process');
 const express = require('express');
 const mongoose = require('mongoose');

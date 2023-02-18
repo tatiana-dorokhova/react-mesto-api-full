@@ -7,6 +7,7 @@ const { CREATED_STATUS } = require('../utils/constants');
 
 const getCards = (req, res, next) => {
   Card.find({})
+    .populate(['owner', 'likes'])
     .then((cardList) => {
       res.send(cardList);
     })
@@ -16,13 +17,14 @@ const getCards = (req, res, next) => {
 const deleteCardById = (req, res, next) => {
   // сначала найти карточку в базе и сравнить id пользователя с текущим
   Card.findById(req.params.cardId)
+    .populate('owner')
     .then((card) => {
       // если карточка не найдена, то вернуть ошибку 404
       if (!card) {
         throw new NotFoundError('Карточка с указанным id не найдена');
       }
       // если владелец карточки не равен текущему пользователю, выдать ошибку 403
-      if (card.owner.toString() !== req.user._id) {
+      if (card.owner.id !== req.user._id) {
         throw new ForbiddenError('Можно удалять только свои карточки');
       }
       // если владелец карточки равен текущему пользователю,
@@ -46,7 +48,9 @@ const createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(CREATED_STATUS).send(card))
+    .then((card) => {
+      res.status(CREATED_STATUS).send(card);
+    })
     .catch((err) => {
       // если произошла ошибка валидации данных, то выдать ошибку 400
       if (err instanceof Error.ValidationError) {
@@ -62,6 +66,7 @@ const likeCard = (req, res, next) => Card.findByIdAndUpdate(
   { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
   { new: true },
 )
+  .populate(['owner', 'likes'])
   .then((card) => {
     // если формат переданного cardId верный,
     // но карточка по нему не найдена (равна null), вернуть ошибку 404
@@ -84,6 +89,7 @@ const dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   { $pull: { likes: req.user._id } }, // убрать _id из массива
   { new: true },
 )
+  .populate(['owner', 'likes'])
   .then((card) => {
     // если формат переданного cardId верный,
     // но карточка по нему не найдена (равна null), вернуть ошибку 404
