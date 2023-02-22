@@ -49,7 +49,11 @@ const createCard = (req, res, next) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.status(CREATED_STATUS).send(card);
+      card
+        .populate('owner')
+        .then((cardWithOwner) => {
+          res.status(CREATED_STATUS).send(cardWithOwner);
+        });
     })
     .catch((err) => {
       // если произошла ошибка валидации данных, то выдать ошибку 400

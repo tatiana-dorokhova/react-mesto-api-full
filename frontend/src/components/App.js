@@ -157,7 +157,8 @@ function App() {
     auth
       .login({ email, password })
       .then((res) => {
-        if (res.message === 'Authorization successful') {
+        if (res) {
+          setCurrentUser(res);
           setEmail(email);
           setIsLoggedIn(true);
           history.push('/');
@@ -189,11 +190,20 @@ function App() {
       .catch((err) => {
         setIsInfoTooltipOpen(true);
         setIsAuthSuccess(false);
+        console.log(err);
       });
   }
 
   function onSignOut() {
+    // почистить куку
+    auth
+      .signout()
+      .catch((err) => {
+        console.log(err);
+      });
+    setCurrentUser({});
     setIsLoggedIn(false);
+    setIsAuthSuccess(false);
     setEmail('');
     history.push('/sign-in');
   }

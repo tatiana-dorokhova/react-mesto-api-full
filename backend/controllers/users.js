@@ -138,9 +138,23 @@ const login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .send({ message: 'Authorization successful' });
+        .send({
+          _id: user._id,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+        });
     })
     .catch(next);
+};
+
+const clearCookie = (req, res) => {
+  // ситуации, когда токен не передан или по токену не найден пользователь,
+  // отрабатывает мидлварь auth
+  res
+    .clearCookie('jwt')
+    .send({ messsage: 'Logout is successful' });
 };
 
 module.exports = {
@@ -150,4 +164,5 @@ module.exports = {
   getUserMe,
   updateUserData,
   login,
+  clearCookie,
 };

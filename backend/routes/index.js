@@ -1,16 +1,10 @@
 const router = require('express').Router(); // создали роутер
 const usersRouter = require('./users');
 const cardsRouter = require('./cards');
-const { login, createUser } = require('../controllers/users');
+const { login, createUser, clearCookie } = require('../controllers/users');
 const { validateSignIn, validateSignUp } = require('../utils/validateRequestsData');
 const auth = require('../middlewares/auth');
 const NotFoundError = require('../errors/notFoundError');
-
-router.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
 
 router.post(
   '/signin',
@@ -26,6 +20,11 @@ router.post(
 // в случае успеха добавляет в каждый запрос свойство req.user
 // с записанным в него токеном
 router.use(auth);
+
+router.post(
+  '/signout',
+  clearCookie,
+);
 
 router.use('/users', usersRouter);
 router.use('/cards', cardsRouter);
